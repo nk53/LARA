@@ -9,7 +9,7 @@
 #import time as t
 #from numpy import NaN, Inf, arange, isscalar, isnan, asarray, array, newaxis
 #from scipy import spatial, signal, fft, arange
-#from pandas import Series, DataFrame
+from pandas import Series, DataFrame
 #from pandas.tools.plotting import autocorrelation_plot
 #from PIL import Image
 #from pyeeg import * 
@@ -117,7 +117,6 @@ for fpath in fpaths:
   plt.axvline(inflection_point['x'])
   plt.legend(loc=1,prop={'size':10})
   plt.ylabel('# of ROIs with events')
-  #plt.xlabel('Delta')
   
   plt.subplot(414)
   trues    = chi_table.True_Positive + chi_table.True_Negative
@@ -130,3 +129,77 @@ for fpath in fpaths:
   plt.xlabel('Delta')
   
   plt.show()
+
+  # run event detection using the delta value at the inflection point
+  delta = inflection_point['x']
+  print "Chosen delta:", delta
+  peak_amp_temp, peak_sets_temp_x, peak_sets_temp_y = pdlearn.event_detection(data_smooth, delta, rate)
+  
+  # event summary table
+  event_summary = DataFrame(index = data_orignal.columns)
+  event_summary['RAIN'] = peak_amp_temp.loc['count']
+  lcpro_all = Series()
+  lcpro_edit = Series()
+  for key, events in events_x.iteritems():
+      number_events = len(events)
+      if key in data_edit.columns:
+          lcpro_edit[key] = number_events
+      lcpro_all[key] = number_events
+  event_summary['LCPro, All'] = lcpro_all
+  event_summary['LCpro, select'] = lcpro_edit
+  event_summary = event_summary.fillna(0)
+  # event_summary contains the number of events in each ROI, according to RAIN, LCPro,
+  # and according to post-processed LCPro ("LCPro, select")
+  print "Total number of ROIs for each type of detection"
+  print event_summary[event_summary>=1].count()
+  
+  chi_table = DataFrame(index = ['True', 'False'], columns= ['Positive', 'Negative'])
+  
+  #true positive
+  temp = event_summary[event_summary['RAIN']>=1]
+  true_positive = len(temp[temp['LCpro, select']>=1])
+  chi_table.Positive['True'] = true_positive 
+  
+  #true negative
+  temp = event_summary[event_summary['RAIN']<1]
+  temp = temp.fillna(0)
+  true_neg = len(temp[temp['LCpro, select']==0])
+  chi_table.Negative['True'] = true_neg
+  
+  #false positive
+  temp = event_summary[event_summary['RAIN']>=1]
+  temp = temp.fillna(0)
+  false_positive = len(temp[temp['LCpro, select']==0])
+  chi_table.Positive['False'] = false_positive
+  
+  #false negative
+  temp = event_summary[event_summary['RAIN']<1]
+  false_negative = len(temp[temp['LCpro, select']>=1])
+  chi_table.Negative['False'] = false_negative
+  
+  print "Chi table:"
+  print chi_table
+  
+  # colocalization plot
+  print "Generating colocalization plot"
+  pdlearn.coloc_2d(roi_loc_orignal, event_summary, im, s = 50)
+  
+  ## individual line plot
+  #label = 'Roi31'
+  #
+  #plt.plot(data_orignal.index, data_orignal[label], label = 'original', color = 'r')
+  #plt.plot(data_orignal.index, data_smooth[label], label = 'smooth', color = 'b')
+  #plt.plot(events_x[label], events_y[label], marker = "^", color="g", linestyle= "None")
+  #plt.plot(peak_sets_temp_x[label], peak_sets_temp_y[label], marker = "^", color="y", linestyle= "None")
+  #plt.title(label)
+  #plt.show()
+  
+  # generate all line plots; saves out automatically
+  print "Generating/saving line plots"
+  pdutils.line_plots(data_orignal, data_smooth, events_x, events_y, \
+                     peak_sets_temp_x, peak_sets_temp_y, event_summary,File_path)
+  
+  # save tables
+  print "Saving tables"
+  event_summary.to_csv(r'%s/Event_summary_table_delta-%s.csv'%(File_path, delta))
+  chi_table.to_csv(r'%s/chi_table_delta-%s.csv'%(File_path, delta))
