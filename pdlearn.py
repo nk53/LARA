@@ -2,13 +2,15 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+import pdmath
+from operator import itemgetter
 from pandas import Series, DataFrame
 from numpy import NaN, Inf, arange, isscalar, asarray, array
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from sklearn.pipeline import Pipeline
 from scipy.interpolate import UnivariateSpline
-from . import pdmath
+
 
 def delta_tuner(dataframe, epsilon, rate): #choose which data to use to tune. can be either selected list or full ist. AD reccoments full list.
     '''
@@ -337,10 +339,10 @@ def cubicRegression(training_set, target):
     NaNs are discarded
     '''
     
-    # clean data of NaNs
-    data = vstack([training_set, target]).T
-    data = data[~isnan(data).any(axis=1)]
-    fixed_set, fixed_target = data[:,0], data[:,1]
+    ## clean data of NaNs
+    #data = vstack([training_set, target]).T
+    #data = data[~isnan(data).any(axis=1)]
+    #fixed_set, fixed_target = data[:,0], data[:,1]
     
     # define cubic regression model
     model = Pipeline([('poly', PolynomialFeatures(degree=3)),
@@ -368,17 +370,51 @@ def splineSmooth(x, y):
     Returns a smoothed line from the (x,y) data given via UnivariateSpline
     with an automatically-determined smoothing factor
     '''
-    # clean NaNs from (x,y)
-    data = vstack([x, y]).T
-    data = data[~isnan(data).any(axis=1)]
-    fx, fy = data[:,0], data[:,1]
-    
+    ## clean NaNs from (x,y)
+    #data = vstack([x, y]).T
+    #data = data[~isnan(data).any(axis=1)]
+    #fx, fy = data[:,0], data[:,1]
+    x = x[1:] # the NaNs are consistently in
+    y = y[1:] # the 0th index position
+
     # perform smoothing
-    spline = UnivariateSpline(fx, fy, s=None)
-    xs = linspace(fx[0], fx[-1], len(fx)*10)
-    ys = spline(xs)
+    s = UnivariateSpline(x, y, s=len(x)*2)
+    xs = np.linspace(x[0], x[-1], len(x)*10)
+    ys = s(xs)
     
-    # smoothed spline
-    return xs, ys
+    # get 2nd derivative
+    derivative2 = s.derivative(n=2)
+    yd = derivative2(xs)
+    coeffs = derivative2.get_coeffs()
+    knots  = derivative2.get_knots()
+    
+    # next part won't work if arrays aren't of equal size
+    if len(coeffs) != len(knots):
+      print "Lengths do not match"; quit()
+    
+    # Get the lines describing the 2nd derivative and the points where y=0
+    lines = []
+    zeros = []
+    for i in range(len(coeffs) - 1):
+      x1, x2 = knots[i], knots[i+1]
+      y1, y2 = coeffs[i], coeffs[i+1]
+      line = pdmath.linef2pts([x1, y1], [x2, y2], solve="x")
+      line_zero = pdmath.linzero(line, x1, x2)
+      lines.append(line)
+      if line_zero != None:
+        zeros.append(line_zero)
+    
+    # We want the inflection point that's closest to the median
+    zeros = array(zeros)
+    med = np.median(x)
+    diffs = abs(zeros - med)
+    ipoint_index = min(enumerate(diffs), key=itemgetter(1))[0]
+    ipoint = zeros[ipoint_index]
+    
+    smoothed_spline  = {'xs' : xs, 'ys' : ys}
+    second_derivative   = {'xs' : xs, 'ys' : yd}
+    inflection_point = {'index' : ipoint_index,
+                            'x' : ipoint,
+                            'y' : yd[ipoint_index]}
 
-
+    return smoothed_spline, second_derivative, inflection_point

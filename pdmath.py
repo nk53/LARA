@@ -22,36 +22,36 @@ def polyn_value(coefficients, x):
     
     return value
 
- def linef2pts(pt1, pt2, solve="y"):
-   '''
-   Given two points (pt1 and pt2), return a function for the line
-   between those two points
-   
-   expects pt1 and pt2 to each have length 2, dtype float
-   default is to solve for y (returning y=f(x)); but you can also
-   choose solve="x" to return x=f^-1(y)
-   '''
-   x1, y1 = pt1[0], pt1[1]
-   x2, y2 = pt2[0], pt2[1]
+def linef2pts(pt1, pt2, solve="y"):
+    '''
+    Given two points (pt1 and pt2), return a function for the line
+    between those two points
+    
+    expects pt1 and pt2 to each have length 2, dtype float
+    default is to solve for y (returning y=f(x)); but you can also
+    choose solve="x" to return x=f^-1(y)
+    '''
+    x1, y1 = pt1[0], pt1[1]
+    x2, y2 = pt2[0], pt2[1]
  
-   m = (y1 - y2) / (x1 - x2)
+    m = (y1 - y2) / (x1 - x2)
  
-   if solve == "y":
-     return lambda x: m * (x - x1) + y1
-   elif solve == "x":
-     return lambda y: (y - y1) / m + x1
-   else:
-     print "Can only solve for x or y"
+    if solve == "y":
+      return lambda x: m * (x - x1) + y1
+    elif solve == "x":
+      return lambda y: (y - y1) / m + x1
+    else:
+      print "Can only solve for x or y"
  
- def linzero(fm1, a, b):
-   '''
-   Returns fm1(0) if the result is between a and b, None otherwise
-   
-   fm1 is assumed to be the inverse (f^-1(x)) function of f
-   '''
-   result = fm1(0)
+def linzero(fm1, a, b):
+    '''
+    Returns fm1(0) if the result is between a and b, None otherwise
+    
+    fm1 is assumed to be the inverse (f^-1(x)) function of f
+    '''
+    result = fm1(0)
+
+    if result > b or result < a:
+      result = None
  
-   if result > b or result < a:
-     result = None
- 
-   return result
+    return result
