@@ -1,19 +1,6 @@
 #!/usr/bin/env python
-#import numpy as np
-#import scipy
-#import sys
-#import os, errno
-#import matplotlib.patches as patches
-#import pandas as pd
-#import matplotlib.pyplot as plt
-#import time as t
-#from numpy import NaN, Inf, arange, isscalar, isnan, asarray, array, newaxis
-#from scipy import spatial, signal, fft, arange
-from pandas import Series, DataFrame
-#from pandas.tools.plotting import autocorrelation_plot
-#from PIL import Image
-#from pyeeg import * 
 
+from pandas import Series, DataFrame
 import pdutils, pdmath, pdlearn
 import os.path
 import matplotlib.pyplot as plt
