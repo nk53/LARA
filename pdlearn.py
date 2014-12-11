@@ -115,7 +115,7 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     y = np.concatenate((firstvals, y, lastvals))
     return np.convolve( m[::-1], y, mode='valid')
 
-def coloc_2d(roi_loc_orignal, event_summary, im, s = 6):
+def coloc_2d(roi_loc_orignal, event_summary, im, s = 6, filename=None):
     '''
     show all roi's. if detected by LCpro, in blue, if detected by RAIN, yellow. green for overlap.
     '''
@@ -145,8 +145,11 @@ def coloc_2d(roi_loc_orignal, event_summary, im, s = 6):
     plt.ylim(ymin = 0, ymax = height) #set y limit to be the size of the image
     plt.title('Event detection overlap (Magenta!)') 
     plt.imshow(im)
-
-    plt.show()
+    
+    if filename == None:
+      plt.show()
+    else:
+      plt.savefig(filename)
     
 def peakdet(v, delta, x = None):
     """
