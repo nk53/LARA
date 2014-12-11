@@ -15,6 +15,9 @@ stats_out_header = '\t'.join(
    'max accuracy', 'false positives', 'false negatives']
 )
 
+# Where we write errors
+logfile = "errlog.txt"
+
 # The newline separator
 nl = os.linesep
 
@@ -37,7 +40,15 @@ for subject_type in subject_types:
       File_path = os.path.join(type_path, data_dir)
       print "Starting %s" % (File_path)
       
-      loaded_stats = pdutils.load_files(File_path)
+      # Sometimes the "ROI normalized.txt" file is missing
+      try:
+        loaded_stats = pdutils.load_files(File_path)
+      except IOError as e:
+        errstr = "I/O error({0}): {1}".format(e.errno, e.strerror)
+        print errstr
+        log_fh = open(logfile, 'a')
+        log_fh.write(errstr)
+        continue
       
       data_orignal, data_edit, roi_param_original, roi_param_edit, im, roi_loc_lcpro, \
         roi_x_lcpro, roi_y_lcpro , roi_loc_orignal, roi_x_orignal, roi_y_orignal, events_x, \
@@ -135,7 +146,8 @@ for subject_type in subject_types:
       plt.ylabel('Accuracy')
       plt.xlabel('Delta')
       
-      plt.show()
+      #plt.show()
+      plt.savefig('plots/delta-%s.tif' % (data_dir))
       
       # we'll want this later
       max_accuracy = max(map(float, array(accuracy)[1:]))
@@ -196,7 +208,9 @@ for subject_type in subject_types:
       
       # colocalization plot
       print "Generating colocalization plot"
-      pdlearn.coloc_2d(roi_loc_orignal, event_summary, im, s = 50)
+      
+      pdlearn.coloc_2d(roi_loc_orignal, event_summary, im, s = 50,
+        filename='plots/coloc-%s.tif' % (data_dir))
       
       ## individual line plot
       #label = 'Roi31'
