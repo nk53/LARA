@@ -379,7 +379,7 @@ def splineSmooth(x, y):
     #fx, fy = data[:,0], data[:,1]
     x = x[1:] # the NaNs are consistently in
     y = y[1:] # the 0th index position
-
+    
     # perform smoothing
     s = UnivariateSpline(x, y, s=len(x)*2)
     xs = np.linspace(x[0], x[-1], len(x)*10)
@@ -407,17 +407,22 @@ def splineSmooth(x, y):
       if line_zero != None:
         zeros.append(line_zero)
     
-    # We want the inflection point that's closest to the median
-    zeros = array(zeros)
-    med = np.median(x)
-    diffs = abs(zeros - med)
-    ipoint_index = min(enumerate(diffs), key=itemgetter(1))[0]
-    ipoint = zeros[ipoint_index]
-    
+    if zeros != []:
+      # We want the inflection point that's closest to the median
+      zeros = array(zeros)
+      med = np.median(x)
+      diffs = abs(zeros - med)
+      ipoint_index = min(enumerate(diffs), key=itemgetter(1))[0]
+      ipoint = zeros[ipoint_index]
+      inflection_point = {'index' : ipoint_index,         
+                              'x' : ipoint,
+                              'y' : yd[ipoint_index]}
+    else:
+      inflection_point = {'index' : None,
+                              'x' : NaN,
+                              'y' : NaN}
+
     smoothed_spline  = {'xs' : xs, 'ys' : ys}
     second_derivative   = {'xs' : xs, 'ys' : yd}
-    inflection_point = {'index' : ipoint_index,
-                            'x' : ipoint,
-                            'y' : yd[ipoint_index]}
 
     return smoothed_spline, second_derivative, inflection_point

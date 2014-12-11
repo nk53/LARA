@@ -44,7 +44,7 @@ for subject_type in subject_types:
       try:
         loaded_stats = pdutils.load_files(File_path)
       except IOError as e:
-        errstr = "I/O error({0}): {1}".format(e.errno, e.strerror)
+        errstr = "I/O error({0}): {1} for file: {2}{3}".format(e.errno, e.strerror, File_path, nl)
         print errstr
         log_fh = open(logfile, 'a')
         log_fh.write(errstr)
@@ -108,6 +108,7 @@ for subject_type in subject_types:
       results_average, results_num, chi_table = \
         pdlearn.delta_tuner2(data_smooth, epsilon, rate, events_x, loaded_stats)
       print "Fitting cubic spline"
+      
       smoothed_spline, second_derivative, inflection_point = \
         pdlearn.splineSmooth(array(results_num.index), array(results_num))
       #graph using the call below
@@ -148,6 +149,14 @@ for subject_type in subject_types:
       
       #plt.show()
       plt.savefig('plots/delta-%s.tif' % (data_dir))
+      
+      # Skip the rest if there was no inflection point
+      if inflection_point['index'] == None:
+        errstr = "Skipping %s" % (File_path)
+        print errstr
+        log_fh = open(logfile, 'a')
+        log_fh.write(errstr)
+        continue
       
       # we'll want this later
       max_accuracy = max(map(float, array(accuracy)[1:]))
