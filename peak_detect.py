@@ -9,6 +9,15 @@ from pandas import DataFrame
 
 print "Notebook initalized"    
 
+# This line gets printed first in each stats_out file
+stats_out_header = '\t'.join(
+  ['file', 'subject type', 'delta', 'accuracy',
+   'max accuracy', 'false positives', 'false negatives']
+)
+
+# The newline separator
+nl = os.linesep
+
 # Loop over each folder in fpaths.txt
 Base_path = os.path.abspath('../data')
 fpaths = [line.strip() for line in open("fpaths.txt")]
@@ -21,6 +30,9 @@ for subject_type in subject_types:
   for injection in injections:
     type_path = os.path.join(Base_path, subject_type, injection, 'Analyzed')
     data_dirs = os.listdir(type_path)
+    # open file for stats output, line buffered
+    stats_out = open('%s_%s.txt' % (subject_type, injection), 'w', 0)
+    stats_out.write(stats_out_header + nl)
     for data_dir in data_dirs:
       File_path = os.path.join(type_path, data_dir)
       print "Starting %s" % (File_path)
@@ -124,6 +136,9 @@ for subject_type in subject_types:
       plt.xlabel('Delta')
       
       plt.show()
+      
+      # we'll want this later
+      max_accuracy = max(map(float, array(accuracy)[1:]))
 
       # run event detection using the delta value at the inflection point
       delta = inflection_point['x']
@@ -158,8 +173,8 @@ for subject_type in subject_types:
       #true negative
       temp = event_summary[event_summary['RAIN']<1]
       temp = temp.fillna(0)
-      true_neg = len(temp[temp['LCpro, select']==0])
-      chi_table.Negative['True'] = true_neg
+      true_negative = len(temp[temp['LCpro, select']==0])
+      chi_table.Negative['True'] = true_negative
       
       #false positive
       temp = event_summary[event_summary['RAIN']>=1]
@@ -171,6 +186,10 @@ for subject_type in subject_types:
       temp = event_summary[event_summary['RAIN']<1]
       false_negative = len(temp[temp['LCpro, select']>=1])
       chi_table.Negative['False'] = false_negative
+      
+      # "accuracy" for this delta
+      delta_accuracy = (true_positive + true_negative) / \
+        (true_positive + true_negative + false_positive + false_negative)
       
       print "Chi table:"
       print chi_table
@@ -198,3 +217,8 @@ for subject_type in subject_types:
       print "Saving tables"
       event_summary.to_csv(r'%s/Event_summary_table_delta-%s.csv'%(File_path, delta))
       chi_table.to_csv(r'%s/chi_table_delta-%s.csv'%(File_path, delta))
+      
+      # Write out some stats locally
+      output = ' '.join(map(str, [data_dir, subject_type, delta, delta_accuracy,
+        max_accuracy, false_positive, false_negative]))
+      stats_out.write(output + nl)
