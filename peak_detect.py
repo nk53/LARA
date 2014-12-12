@@ -17,13 +17,10 @@ stats_header = '\t'.join(
 
 # Where we write errors
 logfile = "errlog.txt"
-
 # The newline separator
 nl = os.linesep
-
-# Loop over each folder in fpaths.txt
+# Data superdirectory
 Base_path = os.path.abspath('../data')
-fpaths = [line.strip() for line in open("fpaths.txt")]
 
 # Loop over all data, record stats by subject_type/injection
 subject_types = ['AH', 'AN', 'FH', 'FN']
