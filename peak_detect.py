@@ -241,7 +241,7 @@ for subject_type in subject_types:
       chi_table.to_csv(r'%s/chi_table_delta-%s.csv'%(File_path, delta))
       
       # Write out some stats locally
-      output = ' '.join(map(str, [data_dir, subject_type, delta, delta_accuracy,
+      output = '\t'.join(map(str, [data_dir, subject_type, delta, delta_accuracy,
         max_accuracy, false_positive, false_negative]))
       stats_spec.write(output + nl)
       stats_all.write(output + nl)
