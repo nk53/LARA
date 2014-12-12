@@ -29,12 +29,12 @@ injections = ['Control', 'FPL', 'FPL & NIF']
 stats_all = open('stats.txt', 'w')
 stats_all.write(stats_header + nl)
 for subject_type in subject_types:
+  # open file for stats output, line buffered
+  stats_spec = open('%s.txt' % (subject_type), 'w', 0)
+  stats_spec.write(stats_header + nl)
   for injection in injections:
     type_path = os.path.join(Base_path, subject_type, injection, 'Analyzed')
     data_dirs = os.listdir(type_path)
-    # open file for stats output, line buffered
-    stats_spec = open('%s_%s.txt' % (subject_type, injection), 'w', 0)
-    stats_spec.write(stats_header + nl)
     for data_dir in data_dirs:
       File_path = os.path.join(type_path, data_dir)
       print "Starting %s" % (File_path)
