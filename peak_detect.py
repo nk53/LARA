@@ -208,8 +208,9 @@ for subject_type in subject_types:
       chi_table.Negative['False'] = false_negative
       
       # "accuracy" for this delta
-      delta_accuracy = (true_positive + true_negative) / \
-        (true_positive + true_negative + false_positive + false_negative)
+      trues = float(true_positive + true_negative)
+      falses = float(false_positive + false_negative)
+      delta_accuracy = trues / (trues+falses)
       
       print "Chi table:"
       print chi_table
