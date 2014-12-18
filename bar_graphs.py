@@ -20,9 +20,9 @@ std = treatment.std()
 
 # plot deltas
 average['delta'].plot(kind='bar', yerr=std['delta'], color='#C0C0C0')
-plt.title('Delta by group')
+plt.title('Delta by Group')
 plt.xlabel('Age and Treatment Group')
-plt.ylabel('Delta value selected')
+plt.ylabel('Selected Delta')
 plt.savefig('deltas.tif')
 
 # plot false pos/neg together
@@ -30,7 +30,7 @@ avg_f = average[['false positives', 'false negatives']]
 std_f = std[['false positives', 'false negatives']]
 colors_multiple = ['#C0C0C0', '#F0F0F0']
 avg_f.plot(kind='bar', yerr=std_f, color=colors_multiple)
-plt.title('False positives by group')
+plt.title('False Categorization by Group')
 plt.xlabel('Age and Treatment Group')
 plt.ylabel('False Positives')
 plt.savefig('falses.tif')
@@ -39,4 +39,7 @@ plt.savefig('falses.tif')
 avg_a = average[['accuracy', 'max accuracy']]
 std_a = std[['accuracy', 'max accuracy']]
 avg_a.plot(kind='bar', yerr=std_a, color=colors_multiple)
+plt.title('Accuracy of Selected Delta VS. Maximum Theoretical Delta')
+plt.ylabel('Accuracy')
+plt.xlabel('Age and Treatment Group')
 plt.savefig('accuracy.tif')
