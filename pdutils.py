@@ -8,7 +8,7 @@ import matplotlib.patches as patches
 from pandas import DataFrame
 from PIL import Image
 from pyeeg import * 
-from numpy import NaN, Inf, arange, isscalar, asarray, array 
+from numpy import NaN, Inf, arange, isscalar, asarray, array, hstack
 
 def load_files(folder):
     '''
@@ -245,3 +245,19 @@ def line_plots(data_orignal, data_smooth, events_x, events_y, peak_sets_temp_x, 
             plt.plot(peak_sets_temp_x[label], peak_sets_temp_y[label], marker = "^", color="y", linestyle= "None")
         plt.savefig(r'%s/plots/%s.pdf' %(folder,label))
         plt.close()
+
+def normed_hist(data_series, x_range=None, y_range=None, bins=10):
+  # make normalized histogram
+  y, edges = np.histogram(data_series, bins=bins, range=x_range)
+  centers = 0.5 * (edges[1:] + edges[:-1])
+  delta = edges[1] - edges[0]
+  y = array(map(float, y))
+  ysum = sum(y)
+  y /= ysum
+  
+  # plot
+  low = centers[0] - delta
+  high = centers[-1] + delta
+  plot = pd.Series(y, centers).plot(xlim=x_range, ylim=y_range, linewidth=3)
+  
+  return plot
