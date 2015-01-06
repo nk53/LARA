@@ -212,9 +212,9 @@ for subject_type in subject_types:
       falses = float(false_positive + false_negative)
       delta_accuracy = trues / (trues+falses)
       
-      # sensitivity - probability of a negative test given an actual negative
+      # sensitivity - probability of positive test given an actual positive
       sensitivity = true_positive / (true_positive + false_negative)
-      # specificity - probability of positive test given an actual positive
+      # specificity - probability of negative test given an actual negative
       specificity = true_negative / (true_negative + false_positive)
       
       print "Chi table:"
