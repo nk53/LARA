@@ -14,7 +14,7 @@ def load_files(folder):
     '''
     this function takes a path to where all of the LC_pro saved files are. There should be 3 files:
     'ROI normailed.text' - the ROI intensity time series data. Units should be in time (not frame) and relative intensity
-    'Parameter List_edit.txt' - this is the events' information file. Duplicate ROIs are expected (since an ROI can have multipule events). The orignal LC_pro file can be loaded, as long as the name is changed to match. 
+    'Parameter List_edit.txt' - this is the events' information file. Duplicate ROIs are expected (since an ROI can have multipule events). The original LC_pro file can be loaded, as long as the name is changed to match. 
     'rbg.png' - A still of the video, must be .png. If it is a .tif, it will load, but it will be pseudo colored. it can be just a frame or some averaged measures.
     
     if the files are not named properly or the path is wrong, it will throw a file not found error.
@@ -34,18 +34,18 @@ def load_files(folder):
     del data['Unnamed: 0'] #lc_pro outputs a weird blank column named this everytime. I don't know why, but it does. this line deletes it safely.
     roi_loc_lcpro, roi_x_lcpro, roi_y_lcpro, data_edit = lcpro_param_parse(roi_param_edit, data , original=False) #use the parameter list to get the x and y location for each ROI
 
-    roi_loc_orignal, roi_x_orignal, roi_y_orignal, data_orignal  = lcpro_param_parse(roi_param_original, data , original=True) #use the parameter list to get the x and y location for each ROI
+    roi_loc_original, roi_x_original, roi_y_original, data_original  = lcpro_param_parse(roi_param_original, data , original=True) #use the parameter list to get the x and y location for each ROI
     
     print "Configured Data"
     
-    events_x, events_y = get_events(data = data_orignal, roi_param = roi_param_original) #use the parameter list to get the location and amplitude of each event for every ROI
+    events_x, events_y = get_events(data = data_original, roi_param = roi_param_original) #use the parameter list to get the location and amplitude of each event for every ROI
     print "LCPro events extracted"
     
     path = folder +"/plots"
     mkdir_p(path) #makes a plots folder inside the path where the data was loaded from
     print "Made plots folder"
     
-    return data_orignal, data_edit, roi_param_original, roi_param_edit, im, roi_loc_lcpro, roi_x_lcpro, roi_y_lcpro , roi_loc_orignal, roi_x_orignal, roi_y_orignal, events_x, events_y
+    return data_original, data_edit, roi_param_original, roi_param_edit, im, roi_loc_lcpro, roi_x_lcpro, roi_y_lcpro , roi_loc_original, roi_x_original, roi_y_original, events_x, events_y
     
 def lcpro_param_parse(roi_param, data , original = True):
     '''
@@ -116,7 +116,7 @@ def mkdir_p(path):
             pass
         else: raise
 
-def coloc_2d(roi_loc_orignal, event_summary, im, s = 6):
+def coloc_2d(roi_loc_original, event_summary, im, s = 6):
     '''
     show all roi's. if detected by LCpro, in blue, if detected by RAIN, yellow. green for overlap.
     '''
@@ -126,18 +126,18 @@ def coloc_2d(roi_loc_orignal, event_summary, im, s = 6):
     
     fig, ax = plt.subplots()
     
-    for roi in roi_loc_orignal.index: #for each ROI from the original LCpro output
+    for roi in roi_loc_original.index: #for each ROI from the original LCpro output
         
-        col = ax.scatter(roi_loc_orignal.loc[roi].x, roi_loc_orignal.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'w' , marker ="o", alpha = 0.5) #the col thing was an attempt to make this figure interactive with onpick, but it didn't work. this is therefore an artifacct that i am too lazy to get rid of
+        col = ax.scatter(roi_loc_original.loc[roi].x, roi_loc_original.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'w' , marker ="o", alpha = 0.5) #the col thing was an attempt to make this figure interactive with onpick, but it didn't work. this is therefore an artifacct that i am too lazy to get rid of
         
         if roi in rain_events_list: #if this object was detected by rain, plot it in yellow
-            plt.scatter(roi_loc_orignal.loc[roi].x, roi_loc_orignal.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'y' , marker ="o", alpha = 0.5)
+            plt.scatter(roi_loc_original.loc[roi].x, roi_loc_original.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'y' , marker ="o", alpha = 0.5)
         
         if roi in lcpro_events_select_list: #if this object was detected by LCPro, plot it in blue
-            plt.scatter(roi_loc_orignal.loc[roi].x, roi_loc_orignal.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'b' , marker ="o", alpha = 0.5)
+            plt.scatter(roi_loc_original.loc[roi].x, roi_loc_original.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'b' , marker ="o", alpha = 0.5)
         
         if roi in lcpro_events_select_list and roi in rain_events_list: #if this object was detected by both, overlay in magenta! ooo, magenta
-            plt.scatter(roi_loc_orignal.loc[roi].x, roi_loc_orignal.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'm' , marker ="o", alpha = 0.75)
+            plt.scatter(roi_loc_original.loc[roi].x, roi_loc_original.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'm' , marker ="o", alpha = 0.75)
     
     #fig.canvas.mpl_connect('pick_event', onpick)    #this was that artifact from the col = ax. line above. this is the depths of my laziness. and i'm in a rush.
     
@@ -220,24 +220,24 @@ def peakdet(v, delta, x = None):
  
     return array(maxtab)#, array(mintab)
 
-def line_plots(data_orignal, data_smooth, events_x, events_y, peak_sets_temp_x, peak_sets_temp_y, event_summary,folder):
+def line_plots(data_original, data_smooth, events_x, events_y, peak_sets_temp_x, peak_sets_temp_y, event_summary,folder):
     '''
     creates the plots with two lines: original data and smoothed data. it also overlays the events from LCpro and RAIN.
     '''
     lcpro_events_select_list = event_summary[event_summary['LCpro, select'] >= 1].index.tolist() #list of only roi's found by RAIN
     
-    for label, column in data_orignal.iteritems():
+    for label, column in data_original.iteritems():
         
         plt.figure()
         plt.xlabel('Time (s)')
         plt.ylabel('Intensity')
         plt.title(label)
-        plt.ylim(ymin = min(data_orignal.min()), ymax = max(data_orignal.max()))
-        plt.xlim(xmin = data_orignal.index[0], xmax = data_orignal.index[-1])
+        plt.ylim(ymin = min(data_original.min()), ymax = max(data_original.max()))
+        plt.xlim(xmin = data_original.index[0], xmax = data_original.index[-1])
         
-        plt.plot(data_orignal.index, data_orignal[label], label = 'original', color = 'r')
-        plt.plot(data_orignal.index, data_smooth[label], label = 'smooth', color = 'b')
-        if label in data_orignal.columns:     
+        plt.plot(data_original.index, data_original[label], label = 'original', color = 'r')
+        plt.plot(data_original.index, data_smooth[label], label = 'smooth', color = 'b')
+        if label in data_original.columns:     
             plt.plot(events_x[label], events_y[label], marker = "^", color="r", linestyle= "None")
         if label in lcpro_events_select_list:
             plt.plot(events_x[label], events_y[label], marker = "^", color="g", linestyle= "None")
@@ -246,7 +246,7 @@ def line_plots(data_orignal, data_smooth, events_x, events_y, peak_sets_temp_x, 
         plt.savefig(r'%s/plots/%s.pdf' %(folder,label))
         plt.close()
 
-def normed_hist(data_series, x_range=None, y_range=None, bins=10):
+def normed_hist(data_series, x_range=None, y_range=None, bins=10, ax=None):
   # make normalized histogram
   y, edges = np.histogram(data_series, bins=bins, range=x_range)
   centers = 0.5 * (edges[1:] + edges[:-1])
@@ -258,6 +258,23 @@ def normed_hist(data_series, x_range=None, y_range=None, bins=10):
   # plot
   low = centers[0] - binsize
   high = centers[-1] + binsize
-  plot = pd.Series(y, centers).plot(xlim=x_range, ylim=y_range, linewidth=3)
+  plot = pd.Series(y, centers).plot(
+    xlim=x_range, ylim=y_range, linewidth=3, ax=ax)
+  
+  return plot
+
+def normed_hist2(data_series, hist_args, plot_args):
+  # make normalized histogram
+  y, edges = np.histogram(data_series, **hist_args)
+  centers = 0.5 * (edges[1:] + edges[:-1])
+  binsize = edges[1] - edges[0]
+  y = array(map(float, y))
+  ysum = sum(y)
+  y /= ysum
+  
+  # plot
+  low = centers[0] - binsize
+  high = centers[-1] + binsize
+  plot = pd.Series(y, centers).plot(**plot_args)
   
   return plot

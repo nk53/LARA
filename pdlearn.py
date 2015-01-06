@@ -115,7 +115,7 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     y = np.concatenate((firstvals, y, lastvals))
     return np.convolve( m[::-1], y, mode='valid')
 
-def coloc_2d(roi_loc_orignal, event_summary, im, s = 6, filename=None):
+def coloc_2d(roi_loc_original, event_summary, im, s = 6, filename=None):
     '''
     show all roi's. if detected by LCpro, in blue, if detected by RAIN, yellow. green for overlap.
     '''
@@ -125,18 +125,18 @@ def coloc_2d(roi_loc_orignal, event_summary, im, s = 6, filename=None):
     
     fig, ax = plt.subplots()
     
-    for roi in roi_loc_orignal.index: #for each ROI from the original LCpro output
+    for roi in roi_loc_original.index: #for each ROI from the original LCpro output
         
-        col = ax.scatter(roi_loc_orignal.loc[roi].x, roi_loc_orignal.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'w' , marker ="o", alpha = 0.5) #the col thing was an attempt to make this figure interactive with onpick, but it didn't work. this is therefore an artifacct that i am too lazy to get rid of
+        col = ax.scatter(roi_loc_original.loc[roi].x, roi_loc_original.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'w' , marker ="o", alpha = 0.5) #the col thing was an attempt to make this figure interactive with onpick, but it didn't work. this is therefore an artifacct that i am too lazy to get rid of
         
         if roi in rain_events_list: #if this object was detected by rain, plot it in yellow
-            plt.scatter(roi_loc_orignal.loc[roi].x, roi_loc_orignal.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'y' , marker ="o", alpha = 0.5)
+            plt.scatter(roi_loc_original.loc[roi].x, roi_loc_original.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'y' , marker ="o", alpha = 0.5)
         
         if roi in lcpro_events_select_list: #if this object was detected by LCPro, plot it in blue
-            plt.scatter(roi_loc_orignal.loc[roi].x, roi_loc_orignal.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'b' , marker ="o", alpha = 0.5)
+            plt.scatter(roi_loc_original.loc[roi].x, roi_loc_original.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'b' , marker ="o", alpha = 0.5)
         
         if roi in lcpro_events_select_list and roi in rain_events_list: #if this object was detected by both, overlay in magenta! ooo, magenta
-            plt.scatter(roi_loc_orignal.loc[roi].x, roi_loc_orignal.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'm' , marker ="o", alpha = 0.75)
+            plt.scatter(roi_loc_original.loc[roi].x, roi_loc_original.loc[roi].y,  s = s, edgecolor = 'k', linewidth ='1',color= 'm' , marker ="o", alpha = 0.75)
     
     #fig.canvas.mpl_connect('pick_event', onpick)    #this was that artifact from the col = ax. line above. this is the depths of my laziness. and i'm in a rush.
     
@@ -273,8 +273,8 @@ def delta_tuner2(dataframe, epsilon, rate, events_x, loaded_stats): #choose whic
     this also generates the dataframe that contains the chi table information iteratively, which is then, later, graphable. 
     '''
     
-    data_orignal, data_edit, roi_param_original, roi_param_edit, im, roi_loc_lcpro, \
-      roi_x_lcpro, roi_y_lcpro , roi_loc_orignal, roi_x_orignal, roi_y_orignal, events_x, \
+    data_original, data_edit, roi_param_original, roi_param_edit, im, roi_loc_lcpro, \
+      roi_x_lcpro, roi_y_lcpro , roi_loc_original, roi_x_original, roi_y_original, events_x, \
       events_y = loaded_stats
 
     range_array = np.linspace(0, max(dataframe.max())/2, num = epsilon) #create the array of which delta values to test. the range is from zero (although zero is not used) to half of the max value from the entire data frame. epsilon is used to determine the number of slices to make
@@ -299,7 +299,7 @@ def delta_tuner2(dataframe, epsilon, rate, events_x, loaded_stats): #choose whic
         #results_perc[delta]= perc_roi
         
         #event summary table
-        event_summary = DataFrame(index = data_orignal.columns)
+        event_summary = DataFrame(index = data_original.columns)
         event_summary['RAIN'] = peak_amp_temp.loc['count']
         lcpro_all = Series()
         lcpro_edit = Series()

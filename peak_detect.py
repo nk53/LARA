@@ -49,17 +49,17 @@ for subject_type in subject_types:
         log_fh.write(errstr)
         continue
       
-      data_orignal, data_edit, roi_param_original, roi_param_edit, im, roi_loc_lcpro, \
-        roi_x_lcpro, roi_y_lcpro , roi_loc_orignal, roi_x_orignal, roi_y_orignal, events_x, \
+      data_original, data_edit, roi_param_original, roi_param_edit, im, roi_loc_lcpro, \
+        roi_x_lcpro, roi_y_lcpro , roi_loc_original, roi_x_original, roi_y_original, events_x, \
         events_y = loaded_stats
 
       #handy way to math check the frame rate, since users can't be trusted to know it. 
-      rate = data_orignal.index[1]-data_orignal.index[0]
+      rate = data_original.index[1]-data_original.index[0]
 
       #transformation
       sg_setting = 11
-      data_smooth = DataFrame(index = data_orignal.index)
-      for label, column in data_orignal.iteritems():
+      data_smooth = DataFrame(index = data_original.index)
+      for label, column in data_original.iteritems():
           temp_list = column.tolist()
           temp_list_smooth = pdlearn.savitzky_golay(temp_list, sg_setting, 4)
           data_smooth[label] = temp_list_smooth  
@@ -67,8 +67,8 @@ for subject_type in subject_types:
       ##graph a random Roi to check if the sav golay settings were ok.
       #print "Plotting Roi11: Are the Savitzky-Golay settings OK?"
       #label = 'Roi11'
-      #plt.plot(data_orignal.index, data_orignal[label], label = 'original', color = 'r')
-      #plt.plot(data_orignal.index, data_smooth[label], label = 'smooth', color = 'b')
+      #plt.plot(data_original.index, data_original[label], label = 'original', color = 'r')
+      #plt.plot(data_original.index, data_smooth[label], label = 'smooth', color = 'b')
       #plt.plot(events_x[label], events_y[label], marker = "^", color="g", linestyle= "None")
       #plt.title(label)
       #plt.show()
@@ -166,7 +166,7 @@ for subject_type in subject_types:
       peak_amp_temp, peak_sets_temp_x, peak_sets_temp_y = pdlearn.event_detection(data_smooth, delta, rate)
       
       # event summary table
-      event_summary = DataFrame(index = data_orignal.columns)
+      event_summary = DataFrame(index = data_original.columns)
       event_summary['RAIN'] = peak_amp_temp.loc['count']
       lcpro_all = Series()
       lcpro_edit = Series()
@@ -223,14 +223,14 @@ for subject_type in subject_types:
       # colocalization plot
       print "Generating colocalization plot"
       
-      pdlearn.coloc_2d(roi_loc_orignal, event_summary, im, s = 50,
+      pdlearn.coloc_2d(roi_loc_original, event_summary, im, s = 50,
         filename='plots/coloc-%s.tif' % (data_dir))
       
       ## individual line plot
       #label = 'Roi31'
       #
-      #plt.plot(data_orignal.index, data_orignal[label], label = 'original', color = 'r')
-      #plt.plot(data_orignal.index, data_smooth[label], label = 'smooth', color = 'b')
+      #plt.plot(data_original.index, data_original[label], label = 'original', color = 'r')
+      #plt.plot(data_original.index, data_smooth[label], label = 'smooth', color = 'b')
       #plt.plot(events_x[label], events_y[label], marker = "^", color="g", linestyle= "None")
       #plt.plot(peak_sets_temp_x[label], peak_sets_temp_y[label], marker = "^", color="y", linestyle= "None")
       #plt.title(label)
@@ -238,7 +238,7 @@ for subject_type in subject_types:
       
       # generate all line plots; saves out automatically
       print "Generating/saving line plots"
-      pdutils.line_plots(data_orignal, data_smooth, events_x, events_y, \
+      pdutils.line_plots(data_original, data_smooth, events_x, events_y, \
                          peak_sets_temp_x, peak_sets_temp_y, event_summary,File_path)
       
       # save tables
