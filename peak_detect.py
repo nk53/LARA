@@ -212,6 +212,11 @@ for subject_type in subject_types:
       falses = float(false_positive + false_negative)
       delta_accuracy = trues / (trues+falses)
       
+      # sensitivity - probability of a negative test given an actual negative
+      sensitivity = true_positive / (true_positive + false_negative)
+      # specificity - probability of positive test given an actual positive
+      specificity = true_negative / (true_negative + false_positive)
+      
       print "Chi table:"
       print chi_table
       
@@ -243,6 +248,6 @@ for subject_type in subject_types:
       
       # Write out some stats locally
       output = '\t'.join(map(str, [data_dir, subject_type, delta, delta_accuracy,
-        max_accuracy, false_positive, false_negative]))
+        max_accuracy, false_positive, false_negative, sensitivity, specificity]))
       stats_spec.write(output + nl)
       stats_all.write(output + nl)
