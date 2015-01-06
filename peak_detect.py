@@ -4,7 +4,7 @@ from pandas import Series, DataFrame
 import pdutils, pdmath, pdlearn
 import os, os.path
 import matplotlib.pyplot as plt
-from numpy import array
+from numpy import array, float32
 from pandas import DataFrame
 
 print "Notebook initalized"    
@@ -208,14 +208,14 @@ for subject_type in subject_types:
       chi_table.Negative['False'] = false_negative
       
       # "accuracy" for this delta
-      trues = float(true_positive + true_negative)
-      falses = float(false_positive + false_negative)
+      trues = float32(true_positive + true_negative)
+      falses = float32(false_positive + false_negative)
       delta_accuracy = trues / (trues+falses)
       
       # sensitivity - probability of positive test given an actual positive
-      sensitivity = true_positive / (true_positive + false_negative)
+      sensitivity = true_positive / float32(true_positive + false_negative)
       # specificity - probability of negative test given an actual negative
-      specificity = true_negative / (true_negative + false_positive)
+      specificity = true_negative / float32(true_negative + false_positive)
       
       print "Chi table:"
       print chi_table
