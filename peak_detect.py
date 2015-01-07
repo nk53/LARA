@@ -12,7 +12,8 @@ print "Notebook initalized"
 # This line gets printed first in each stats_spec file
 stats_header = '\t'.join(
   ['file', 'subject type', 'delta', 'accuracy',
-   'max accuracy', 'false positives', 'false negatives']
+   'max accuracy', 'false positives', 'false negatives',
+   'sensitivity', 'specificity']
 )
 
 # Where we write errors
