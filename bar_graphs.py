@@ -16,7 +16,8 @@ data = pd.concat(results)
 
 # Adjust column labels so they will look nice when plotted
 data.columns = pd.Index(
-  ['Subject Type', 'Delta', 'Selected', 'Maximum', 'False Positives', 'False Negatives']
+#  ['Subject Type', 'Delta', 'Selected', 'Maximum', 'False Positives', 'False Negatives', 'Sensitivity', 'Specificity']
+  ['Subject Type', 'Delta', 'Selected Delta', 'Delta with Maximum Accuracy', 'False Positives', 'False Negatives', 'Sensitivity', 'Specificity']
 )
 
 # Get relevant statistics
@@ -26,28 +27,25 @@ std = treatment.std()
 
 # plot deltas
 average['Delta'].plot(kind='bar', yerr=std['Delta'], color='#C0C0C0')
-plt.title('Delta by Group')
-plt.xlabel('Age and Treatment Group')
-plt.ylabel('Selected Delta')
+plt.xticks(rotation='horizontal')
+plt.xlabel('')
 plt.savefig('deltas.tif')
 
-# plot false pos/neg together
-avg_f = average[['False Positives', 'False Negatives']]
-std_f = std[['False Positives', 'False Negatives']]
+# plot sensitivity and specificity together
+avg_f = average[['Sensitivity', 'Specificity']]
+std_f = std[['Sensitivity', 'Specificity']]
 colors_multiple = ['#C0C0C0', '#F0F0F0']
-avg_f.plot(kind='bar', ylim=[0, 90], yerr=std_f, color=colors_multiple)
-plt.title('False Categorization by Group')
-plt.xlabel('Age and Treatment Group')
-plt.ylabel('False Positives')
-plt.savefig('falses.tif')
+avg_f.plot(kind='bar', ylim=[0.0, 1.0], yerr=std_f, color=colors_multiple)
+plt.xticks(rotation='horizontal')
+plt.xlabel('')
+plt.savefig('senspec.tif')
 
 # plot accuracy and max accuracy together
-avges_cols = ['Selected', 'Maximum']
+avges_cols = ['Selected Delta', 'Delta with Maximum Accuracy']
 avg_a = average[avges_cols]
 std_a = std[avges_cols]
 avg_a.plot(kind='bar', yerr=std_a, color=colors_multiple)
-plt.title('Accuracy of Selected Delta vs. Maximum Theoretical Accuracy')
 plt.legend(bbox_to_anchor=(1, 0), loc='lower right')
-plt.ylabel('Accuracy')
-plt.xlabel('Age and Treatment Group')
+plt.xticks(rotation='horizontal')
+plt.xlabel('')
 plt.savefig('accuracy.tif')
