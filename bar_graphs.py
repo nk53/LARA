@@ -23,19 +23,19 @@ data.columns = pd.Index(
 # Get relevant statistics
 treatment = data.groupby(by='Subject Type')
 average = treatment.mean()
-std = treatment.std()
+sem = treatment.sem(ddof=0)
 
 # plot deltas
-average['Delta'].plot(kind='bar', yerr=std['Delta'], color='#C0C0C0')
+average['Delta'].plot(kind='bar', yerr=sem['Delta'], color='#C0C0C0')
 plt.xticks(rotation='horizontal')
 plt.xlabel('')
 plt.savefig('deltas.tif')
 
 # plot sensitivity and specificity together
 avg_f = average[['Sensitivity', 'Specificity']]
-std_f = std[['Sensitivity', 'Specificity']]
+sem_f = sem[['Sensitivity', 'Specificity']]
 colors_multiple = ['#C0C0C0', '#F0F0F0']
-avg_f.plot(kind='bar', ylim=[0.0, 1.0], yerr=std_f, color=colors_multiple)
+avg_f.plot(kind='bar', ylim=[0.0, 1.0], yerr=sem_f, color=colors_multiple)
 plt.xticks(rotation='horizontal')
 plt.xlabel('')
 plt.savefig('senspec.tif')
@@ -43,8 +43,8 @@ plt.savefig('senspec.tif')
 # plot accuracy and max accuracy together
 avges_cols = ['Selected Delta', 'Delta with Maximum Accuracy']
 avg_a = average[avges_cols]
-std_a = std[avges_cols]
-avg_a.plot(kind='bar', yerr=std_a, color=colors_multiple)
+sem_a = sem[avges_cols]
+avg_a.plot(kind='bar', ylim=[0.0, 1.0], yerr=sem_a, color=colors_multiple)
 plt.legend(bbox_to_anchor=(1, 0), loc='lower right')
 plt.xticks(rotation='horizontal')
 plt.xlabel('')
