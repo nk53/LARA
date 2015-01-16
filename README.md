@@ -1,6 +1,6 @@
-=========
-| Usage |
-=========
+__LCPro and RAIN Analysis__
+
+__Usage__
 
 Expects data/ to be located in the project super-directory.
 
